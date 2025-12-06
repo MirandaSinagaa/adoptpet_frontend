@@ -1,15 +1,15 @@
 import axios from 'axios';
 
+// LOGIC: Jika ada Environment Variable (di Vercel), pakai itu. 
+// Jika tidak ada (di Laptop), pakai localhost.
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+
 const api = axios.create({
-    // URL Backend Laravel
-    baseURL: 'http://127.0.0.1:8000/api',
-    
+    baseURL: baseURL,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    
-    // Penting untuk Sanctum
     withCredentials: true, 
 });
 
