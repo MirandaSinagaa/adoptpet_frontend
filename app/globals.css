@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Mendaftarkan Palet Warna Custom Kamu di sini */
+  --color-primary: #84994F;
+  --color-secondary: #FFE797;
+  --color-accent: #FCB53B;
+  --color-danger: #A72703;
+  
+  /* Warna Netral Tambahan */
+  --color-dark: #2D3748;
+  --color-light: #F7FAFC;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Mengatur default body agar menggunakan warna kita */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--color-light); 
+  color: var(--color-dark);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7c40; 
 }
