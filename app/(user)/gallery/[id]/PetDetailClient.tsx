@@ -38,6 +38,10 @@ export default function PetDetailClient({ initialData, id }: { initialData: any,
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State untuk Dropdown Share
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
   const [screening, setScreening] = useState({
     job: "", salary_range: "Di bawah 3 Juta", housing_type: "Rumah Pribadi", has_fence: "Ya", other_pets: "Tidak Ada", family_permission: "Ya", reason_detail: "", terms_agreed: false
   });
@@ -66,6 +70,22 @@ export default function PetDetailClient({ initialData, id }: { initialData: any,
     } catch (error) { toast.error("Gagal update favorit."); }
   };
 
+  // --- FITUR BARU: SHARE FUNCTION ---
+  const handleShare = (platform: 'copy' | 'wa' | 'twitter') => {
+    const url = window.location.href; // Ambil URL halaman saat ini
+    const text = `Ayo adopsi ${pet?.name}, si ${pet?.species} lucu ini di AdoptPet! 🐾`;
+
+    if (platform === 'copy') {
+        navigator.clipboard.writeText(url);
+        toast.success("Link berhasil disalin!");
+    } else if (platform === 'wa') {
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+    } else if (platform === 'twitter') {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    }
+    setIsShareOpen(false); // Tutup dropdown setelah klik
+  };
+
   const handleAdoptSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!screening.terms_agreed) { toast.error("Wajib menyetujui syarat & ketentuan."); return; }
@@ -92,12 +112,41 @@ export default function PetDetailClient({ initialData, id }: { initialData: any,
 
   return (
     <div className="max-w-5xl mx-auto py-8">
-      {/* HEADER */}
+      {/* HEADER: KEMBALI, SHARE & FAVORIT */}
       <div className="flex justify-between items-center mb-6">
-        <Link href="/gallery" className="text-gray-500 hover:text-primary">&larr; Galeri</Link>
-        <button onClick={handleWishlistToggle} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold border ${isWishlisted ? "bg-red-50 text-danger border-red-200" : "bg-white text-gray-500"}`}>
-            <span>{isWishlisted ? "❤️" : "🤍"}</span> {isWishlisted ? "Favorit" : "Favorit"}
-        </button>
+        <Link href="/gallery" className="text-gray-500 hover:text-primary font-medium">&larr; Galeri</Link>
+        
+        <div className="flex gap-2">
+            {/* TOMBOL SHARE (BARU) */}
+            <div className="relative">
+                <button 
+                    onClick={() => setIsShareOpen(!isShareOpen)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full font-bold border bg-white text-gray-500 border-gray-200 hover:bg-gray-50 transition"
+                >
+                    <span>📢</span> Bagikan
+                </button>
+
+                {/* DROPDOWN MENU SHARE */}
+                {isShareOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 animate-fadeIn">
+                        <button onClick={() => handleShare('copy')} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm font-medium flex items-center gap-2">
+                            🔗 Salin Link
+                        </button>
+                        <button onClick={() => handleShare('wa')} className="w-full text-left px-4 py-2 hover:bg-green-50 text-green-600 text-sm font-medium flex items-center gap-2">
+                            📱 WhatsApp
+                        </button>
+                        <button onClick={() => handleShare('twitter')} className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-500 text-sm font-medium flex items-center gap-2">
+                            🐦 Twitter / X
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* TOMBOL FAVORIT */}
+            <button onClick={handleWishlistToggle} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold border transition ${isWishlisted ? "bg-red-50 text-danger border-red-200" : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"}`}>
+                <span>{isWishlisted ? "❤️" : "🤍"}</span> {isWishlisted ? "Favorit" : "Favorit"}
+            </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden flex flex-col md:flex-row">
@@ -183,7 +232,6 @@ export default function PetDetailClient({ initialData, id }: { initialData: any,
                     <input name="other_pets" placeholder="Hewan lain..." className="border p-2 rounded w-full" onChange={handleChange} required />
                     <textarea name="reason_detail" placeholder="Alasan adopsi..." rows={3} className="border p-2 rounded w-full" onChange={handleChange} required />
                     
-                    {/* CHECKBOX DENGAN LINK SYARAT & KETENTUAN (WARNA BIRU) */}
                     <label className="flex gap-2 items-center bg-yellow-50 p-3 rounded border border-yellow-200 cursor-pointer">
                         <input type="checkbox" name="terms_agreed" onChange={handleChange} className="w-5 h-5 text-primary rounded border-gray-300 focus:ring-primary" />
                         <span className="text-sm">

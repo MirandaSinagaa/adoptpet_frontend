@@ -10,13 +10,16 @@ export default function GalleryPage() {
   const [filteredPets, setFilteredPets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // State Filter
-  const [filterSpecies, setFilterSpecies] = useState("all"); // all, cat, dog
+  // State Filter & Search
+  const [filterSpecies, setFilterSpecies] = useState("all"); 
   const [searchQuery, setSearchQuery] = useState("");
+
+  // STATE PAGINATION (FITUR BARU)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Tampilkan 8 hewan per halaman
 
   const fetchPets = async () => {
     try {
-      // Ambil data public (hanya status 'available')
       const response = await api.get("/pets");
       setPets(response.data.data);
       setFilteredPets(response.data.data);
@@ -32,16 +35,16 @@ export default function GalleryPage() {
     fetchPets();
   }, []);
 
-  // Logic Filtering (Jalan setiap kali pets, filter, atau search berubah)
+  // Logic Filtering
   useEffect(() => {
     let result = pets;
 
-    // 1. Filter by Species
+    // Filter Kategori
     if (filterSpecies !== "all") {
       result = result.filter((pet) => pet.species === filterSpecies);
     }
 
-    // 2. Filter by Search (Name / Breed)
+    // Filter Search
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(
@@ -52,7 +55,22 @@ export default function GalleryPage() {
     }
 
     setFilteredPets(result);
+    setCurrentPage(1); // Reset ke halaman 1 setiap kali filter berubah
   }, [pets, filterSpecies, searchQuery]);
+
+  // LOGIC PAGINATION (POTONG DATA)
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredPets.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
 
   return (
     <div className="space-y-8">
@@ -108,7 +126,7 @@ export default function GalleryPage() {
       {/* EMPTY STATE */}
       {!isLoading && filteredPets.length === 0 && (
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-          <div className="text-6xl mb-4">🔍</div>
+          <div className="text-6xl mb-4 grayscale opacity-50">🔍</div>
           <h3 className="text-xl font-bold text-dark">Tidak ada hewan ditemukan.</h3>
           <p className="text-gray-500">Coba ubah kata kunci pencarian atau filter Anda.</p>
         </div>
@@ -116,7 +134,7 @@ export default function GalleryPage() {
 
       {/* GRID HEWAN */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredPets.map((pet) => (
+        {currentItems.map((pet) => (
           <div key={pet.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
             
             {/* Image Container */}
@@ -150,7 +168,7 @@ export default function GalleryPage() {
                 {pet.breed || 'Campuran'} • {pet.species === 'cat' ? 'Kucing' : pet.species === 'dog' ? 'Anjing' : 'Lainnya'}
               </p>
 
-              {/* Tombol Detail (Nanti diarahkan ke Detail Page) */}
+              {/* Tombol Detail */}
               <Link 
                 href={`/gallery/${pet.id}`} 
                 className="block w-full text-center bg-primary text-white py-2 rounded-xl font-bold hover:bg-[#6b7c40] transition"
@@ -161,6 +179,32 @@ export default function GalleryPage() {
           </div>
         ))}
       </div>
+
+      {/* PAGINATION CONTROLS (FITUR BARU) */}
+      {!isLoading && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-8 pt-6 border-t border-gray-100">
+            <button 
+                onClick={handlePrev} 
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg border font-bold text-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                &larr; Sebelumnya
+            </button>
+            
+            <span className="text-sm font-bold text-gray-600">
+                Halaman {currentPage} dari {totalPages}
+            </span>
+
+            <button 
+                onClick={handleNext} 
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg border font-bold text-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Selanjutnya &rarr;
+            </button>
+        </div>
+      )}
+
     </div>
   );
 }

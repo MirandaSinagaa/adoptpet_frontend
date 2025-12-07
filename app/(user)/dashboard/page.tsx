@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [adoptions, setAdoptions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // STATE UNTUK MODAL CANCEL
+  // STATE UNTUK MODAL CANCEL (Dari kode sebelumnya)
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedPetId, setSelectedPetId] = useState<number | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -29,12 +29,15 @@ export default function Dashboard() {
         return;
       }
 
+      // Ambil User
       const resUser = await api.get("/user");
       setUser(resUser.data.data);
 
+      // Ambil Donasi
       const resDonations = await api.get("/user/donations");
       setDonations(resDonations.data.data);
 
+      // Ambil Adopsi
       const resAdoptions = await api.get("/user/adoptions");
       setAdoptions(resAdoptions.data.data);
 
@@ -66,16 +69,14 @@ export default function Dashboard() {
         toast.error("Wajib isi alasan pembatalan.");
         return;
     }
-
     setIsCanceling(true);
     const loadingToast = toast.loading("Memproses pembatalan...");
-
     try {
         await api.post(`/pets/${selectedPetId}/cancel`, { reason: cancelReason });
         toast.dismiss(loadingToast);
         toast.success("Donasi berhasil dibatalkan.");
         setCancelModalOpen(false);
-        fetchData(); // Refresh data dashboard
+        fetchData(); 
     } catch (error) {
         toast.dismiss(loadingToast);
         toast.error("Gagal membatalkan donasi.");
@@ -95,7 +96,7 @@ export default function Dashboard() {
       case 'adopted':
         return <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">Teradopsi 🎉</span>;
       case 'rejected':
-        return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-xs font-bold border border-danger/20">Ditolak Admin</span>;
+        return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-xs font-bold border border-danger/20">Ditolak</span>;
       case 'canceled':
         return <span className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-bold border border-gray-300">Dibatalkan Pemilik</span>;
       default:
@@ -103,10 +104,60 @@ export default function Dashboard() {
     }
   };
 
+  // --- SKELETON LOADING UI (PENGGANTI SPINNER) ---
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="space-y-12 animate-pulse">
+            {/* Header Skeleton */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="space-y-3 w-full">
+                    <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="flex gap-3">
+                    <div className="h-10 w-32 bg-gray-200 rounded-xl"></div>
+                    <div className="h-10 w-32 bg-gray-200 rounded-xl"></div>
+                </div>
+            </div>
+
+            {/* Donasi Skeleton */}
+            <section>
+                <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 h-64 flex flex-col justify-between">
+                            <div className="flex justify-between">
+                                <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                                <div className="h-6 w-24 bg-gray-200 rounded-full"></div>
+                            </div>
+                            <div className="space-y-2 mt-4">
+                                <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                            <div className="h-12 bg-gray-100 rounded mt-4"></div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Adopsi Skeleton */}
+            <section>
+                <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+                <div className="space-y-4">
+                    {[1, 2].map((i) => (
+                        <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center h-24">
+                            <div className="flex items-center gap-4 w-1/2">
+                                <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                                <div className="space-y-2 w-full">
+                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                                </div>
+                            </div>
+                            <div className="h-6 w-24 bg-gray-200 rounded-full"></div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
   }
@@ -114,7 +165,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-12">
       
-      {/* HEADER */}
+      {/* 1. HEADER & PROFILE (DENGAN ORNAMEN BACKGROUND) */}
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
         <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-accent/10 rounded-full blur-2xl"></div>
@@ -164,17 +215,27 @@ export default function Dashboard() {
                         <h3 className="font-bold text-lg text-dark">{pet.name}</h3>
                         <p className="text-sm text-gray-500">{pet.species} • {pet.breed || 'Campuran'}</p>
                         
-                        {/* AREA PESAN STATUS */}
                         <div className="mt-4 pt-4 border-t border-gray-100 flex-grow">
                             {pet.status === 'pending_review' && (
                                 <p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                                    ⏳ Menunggu review Admin.
+                                    ⏳ Admin sedang memeriksa data. Pastikan HP Anda aktif jika admin menghubungi.
                                 </p>
                             )}
                             {pet.status === 'available' && (
                                 <p className="text-xs text-green-700 bg-green-50 p-2 rounded">
-                                    ✅ Tayang di Galeri.
+                                    ✅ Hewan sudah tayang di Galeri. Mohon rawat hewan sampai ada pengajuan adopsi masuk.
                                 </p>
+                            )}
+                            {pet.status === 'adopted' && (
+                                <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
+                                    🎉 Hewan telah menemukan pemilik baru. Terima kasih atas kebaikan Anda!
+                                </p>
+                            )}
+                            {pet.status === 'rejected' && (
+                                <div className="bg-red-50 p-3 rounded border border-red-100">
+                                    <p className="text-xs text-red-700 font-bold mb-1">❌ Donasi Ditolak</p>
+                                    <p className="text-xs text-gray-600 italic">"{pet.admin_note || 'Tidak ada alasan spesifik.'}"</p>
+                                </div>
                             )}
                             {pet.status === 'canceled' && (
                                 <div className="bg-gray-100 p-3 rounded border border-gray-200">
@@ -182,15 +243,9 @@ export default function Dashboard() {
                                     <p className="text-xs text-gray-400 italic">"{pet.cancellation_reason}"</p>
                                 </div>
                             )}
-                            {pet.status === 'rejected' && (
-                                <div className="bg-red-50 p-3 rounded border border-red-100">
-                                    <p className="text-xs text-red-700 font-bold mb-1">❌ Ditolak Admin</p>
-                                    <p className="text-xs text-gray-600 italic">"{pet.admin_note}"</p>
-                                </div>
-                            )}
                         </div>
 
-                        {/* TOMBOL BATALKAN (Hanya muncul jika Pending atau Available) */}
+                         {/* TOMBOL BATALKAN (Hanya jika Pending atau Available) */}
                         {(pet.status === 'pending_review' || pet.status === 'available') && (
                             <button 
                                 onClick={() => openCancelModal(pet.id)}
@@ -199,7 +254,7 @@ export default function Dashboard() {
                                 🚫 Batalkan Donasi
                             </button>
                         )}
-                        
+
                         <div className="mt-3 text-xs text-gray-400 text-right">
                             Diajukan: {new Date(pet.created_at).toLocaleDateString("id-ID")}
                         </div>
@@ -209,7 +264,7 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* 3. TABEL RIWAYAT ADOPSI (Status Hewan yang Anda Minta) */}
+      {/* 3. TABEL ADOPSI SAYA */}
       <section>
         <h2 className="text-xl font-bold text-dark mb-4 flex items-center gap-2 border-b pb-2">
             🏠 Riwayat Pengajuan Adopsi
@@ -239,16 +294,17 @@ export default function Dashboard() {
                         <div className="flex flex-col items-end gap-2 w-full md:w-auto text-right">
                             {getStatusBadge(adoption.status)}
                             
+                            {/* TOMBOL WA (Jika Approved) */}
                             {adoption.status === 'approved' && (
                                 <div className="flex flex-col items-end gap-1">
                                     <p className="text-xs text-green-600 font-bold">Permintaan disetujui!</p>
                                     <a 
-                                        href={`https://wa.me/${ADMIN_WA_NUMBER}?text=Halo Admin, saya ${user?.name}. Pengajuan adopsi ${adoption.pet?.name} (ID: ${adoption.pet?.id}) disetujui.`}
+                                        href={`https://wa.me/${ADMIN_WA_NUMBER}?text=Halo Admin AdoptPet, saya ${user?.name}. Pengajuan adopsi saya untuk hewan ${adoption.pet?.name} (ID: ${adoption.pet?.id}) telah disetujui. Bagaimana prosedur penjemputannya?`}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-xs bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 flex items-center gap-1 transition shadow-sm animate-pulse"
                                     >
-                                        📞 Hubungi Admin
+                                        📞 Hubungi Admin untuk Penjemputan
                                     </a>
                                 </div>
                             )}
