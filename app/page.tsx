@@ -1,10 +1,41 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  // --- LOGIKA ANIMASI GAMBAR HERO ---
+  const heroImages = [
+    "/images/hero-dog.png",    // 1. Anjing
+    "/images/hero-cat.png",    // 2. Kucing
+    "/images/hero-rabbit.png", // 3. Kelinci
+    "/images/hero-bird.png"    // 4. Burung (Baru)
+  ];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // 1. Mulai efek menghilang (fade out)
+      setIsFading(true);
+
+      // 2. Tunggu 0.5 detik, lalu ganti gambar
+      setTimeout(() => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+        // 3. Munculkan kembali (fade in)
+        setIsFading(false);
+      }, 500); 
+
+    }, 4000); // Ganti setiap 4 detik
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   return (
     <div className="space-y-20">
       
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION (ANIMATED) */}
       <section className="relative bg-secondary rounded-3xl overflow-hidden p-8 md:p-16 flex flex-col md:flex-row items-center justify-between shadow-lg">
         <div className="max-w-xl space-y-6 z-10">
           <span className="inline-block bg-white/60 text-primary px-4 py-1 rounded-full text-sm font-semibold tracking-wide">
@@ -33,13 +64,17 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Dekorasi Visual (Bisa diganti Foto nanti) */}
-        <div className="mt-10 md:mt-0 relative">
-          <div className="w-64 h-64 md:w-96 md:h-96 bg-accent/20 rounded-full blur-3xl absolute top-0 right-0 -z-10"></div>
-          {/* Placeholder Gambar: Menggunakan Emoji Besar agar ringan tanpa aset eksternal */}
-          <div className="text-[150px] md:text-[200px] leading-none select-none filter drop-shadow-2xl animate-pulse">
-            🐶
-          </div>
+        {/* Dekorasi Visual (ANIMASI GAMBAR 4 HEWAN) */}
+        <div className="mt-10 md:mt-0 relative flex justify-center items-center w-full md:w-1/2">
+          {/* Background Blur */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-96 md:h-96 bg-accent/20 rounded-full blur-3xl -z-10"></div>
+          
+          {/* Gambar Berubah-ubah */}
+          <img 
+             src={heroImages[currentImageIndex]} 
+             alt="Hewan Peliharaan" 
+             className={`w-[280px] md:w-[450px] object-contain drop-shadow-2xl transform transition-all duration-500 ease-in-out ${isFading ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}
+          />
         </div>
       </section>
 
