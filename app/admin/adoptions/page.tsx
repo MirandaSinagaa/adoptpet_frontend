@@ -163,13 +163,17 @@ export default function AdminAdoptions() {
                     {viewMode === 'detail' && (
                         <div className="space-y-6">
                              {/* Info Singkat */}
-                             <div className="flex items-center gap-4 bg-yellow-50 p-4 rounded-xl border border-yellow-100">
-                                <span className="text-2xl">🐶</span>
-                                <div>
-                                    <p className="text-xs text-gray-500 font-bold uppercase">Hewan yang diminati</p>
-                                    <p className="font-bold text-dark text-lg">{selectedAdoption.pet?.name}</p>
+                             <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-yellow-200 flex-shrink-0">
+                                    {selectedAdoption.pet?.image_url ? (
+                                        <img 
+                                            src={selectedAdoption.pet.image_url} 
+                                            alt={selectedAdoption.pet.name} 
+                                            className="w-full h-full object-cover" 
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-2xl">🐶</div>
+                                    )}
                                 </div>
-                             </div>
 
                              {/* Alasan */}
                              <div>

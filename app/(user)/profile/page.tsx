@@ -31,6 +31,9 @@ export default function ProfilePage() {
             address: userData.address || ""
         });
         setPreviewAvatar(userData.avatar);
+        
+        // PENTING: Sinkronkan sessionStorage saat load awal
+        sessionStorage.setItem("user", JSON.stringify(userData));
       } catch (error) {
         toast.error("Gagal memuat profil.");
       }
@@ -47,9 +50,9 @@ export default function ProfilePage() {
     try {
         const res = await api.put("/user/info", infoForm);
         
-        // Update Session Storage agar Navbar berubah real-time
+        // PERBAIKAN: Update Session Storage agar data di browser sinkron
         sessionStorage.setItem("user", JSON.stringify(res.data.data));
-        setUser(res.data.data); // Update state lokal
+        setUser(res.data.data); 
         
         toast.dismiss(loading);
         toast.success("Profil berhasil diperbarui!");
@@ -76,7 +79,7 @@ export default function ProfilePage() {
         await api.put("/user/password", passForm);
         toast.dismiss(loading);
         toast.success("Password berhasil diganti!");
-        setPassForm({ current_password: "", new_password: "", new_password_confirmation: "" }); // Reset form
+        setPassForm({ current_password: "", new_password: "", new_password_confirmation: "" }); 
     } catch (error: any) {
         toast.dismiss(loading);
         toast.error(error.response?.data?.message || "Gagal ganti password.");
@@ -85,15 +88,13 @@ export default function ProfilePage() {
     }
   };
 
-  // 4. Handle Ganti Avatar (Langsung Upload saat Pilih File)
+  // 4. Handle Ganti Avatar
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Preview Dulu
     setPreviewAvatar(URL.createObjectURL(file));
     
-    // Upload Langsung
     const formData = new FormData();
     formData.append("avatar", file);
     
@@ -103,7 +104,7 @@ export default function ProfilePage() {
             headers: { "Content-Type": "multipart/form-data" }
         });
         
-        // Update Session & State
+        // PERBAIKAN UTAMA: Update Session Storage agar Avatar tidak hilang saat refresh
         sessionStorage.setItem("user", JSON.stringify(res.data.data));
         setUser(res.data.data);
         
@@ -130,7 +131,6 @@ export default function ProfilePage() {
                     <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">👤</div>
                 )}
             </div>
-            {/* Overlay Upload Button */}
             <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold opacity-0 group-hover:opacity-100 transition rounded-full cursor-pointer">
                 <span>Ganti Foto</span>
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
@@ -148,7 +148,6 @@ export default function ProfilePage() {
 
       {/* TABS & FORM */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Tab Header */}
         <div className="flex border-b border-gray-100">
             <button 
                 onClick={() => setActiveTab('info')}
@@ -164,37 +163,20 @@ export default function ProfilePage() {
             </button>
         </div>
 
-        {/* Tab Content */}
         <div className="p-8">
             {activeTab === 'info' ? (
                 <form onSubmit={handleUpdateInfo} className="space-y-6 max-w-lg mx-auto">
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">Nama Lengkap</label>
-                        <input 
-                            type="text" 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            value={infoForm.name}
-                            onChange={(e) => setInfoForm({...infoForm, name: e.target.value})}
-                            required
-                        />
+                        <input type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" value={infoForm.name} onChange={(e) => setInfoForm({...infoForm, name: e.target.value})} required />
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">No. WhatsApp</label>
-                        <input 
-                            type="text" 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            value={infoForm.phone_number}
-                            onChange={(e) => setInfoForm({...infoForm, phone_number: e.target.value})}
-                        />
+                        <input type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" value={infoForm.phone_number} onChange={(e) => setInfoForm({...infoForm, phone_number: e.target.value})} />
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">Alamat</label>
-                        <textarea 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            rows={3}
-                            value={infoForm.address}
-                            onChange={(e) => setInfoForm({...infoForm, address: e.target.value})}
-                        />
+                        <textarea className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" rows={3} value={infoForm.address} onChange={(e) => setInfoForm({...infoForm, address: e.target.value})} />
                     </div>
                     <button type="submit" disabled={isLoading} className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-[#6b7c40] disabled:opacity-50">
                         {isLoading ? "Menyimpan..." : "Simpan Perubahan"}
@@ -207,33 +189,15 @@ export default function ProfilePage() {
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">Password Saat Ini</label>
-                        <input 
-                            type="password" 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            value={passForm.current_password}
-                            onChange={(e) => setPassForm({...passForm, current_password: e.target.value})}
-                            required
-                        />
+                        <input type="password" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" value={passForm.current_password} onChange={(e) => setPassForm({...passForm, current_password: e.target.value})} required />
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">Password Baru</label>
-                        <input 
-                            type="password" 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            value={passForm.new_password}
-                            onChange={(e) => setPassForm({...passForm, new_password: e.target.value})}
-                            required
-                        />
+                        <input type="password" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" value={passForm.new_password} onChange={(e) => setPassForm({...passForm, new_password: e.target.value})} required />
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-dark mb-1">Ulangi Password Baru</label>
-                        <input 
-                            type="password" 
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            value={passForm.new_password_confirmation}
-                            onChange={(e) => setPassForm({...passForm, new_password_confirmation: e.target.value})}
-                            required
-                        />
+                        <input type="password" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" value={passForm.new_password_confirmation} onChange={(e) => setPassForm({...passForm, new_password_confirmation: e.target.value})} required />
                     </div>
                     <button type="submit" disabled={isLoading} className="w-full bg-dark text-white py-3 rounded-xl font-bold hover:bg-gray-800 disabled:opacity-50">
                         {isLoading ? "Memproses..." : "Ganti Password"}
