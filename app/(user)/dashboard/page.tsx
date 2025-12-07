@@ -13,27 +13,28 @@ export default function Dashboard() {
   const [adoptions, setAdoptions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Nomor WA Admin (Ganti dengan nomor asli)
+  // STATE UNTUK MODAL CANCEL
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [selectedPetId, setSelectedPetId] = useState<number | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [isCanceling, setIsCanceling] = useState(false);
+
   const ADMIN_WA_NUMBER = "6281234567890"; 
 
   const fetchData = async () => {
     try {
-      // Gunakan sessionStorage sesuai update terakhir
       const token = sessionStorage.getItem("token");
       if (!token) {
         router.push("/login");
         return;
       }
 
-      // Ambil User
       const resUser = await api.get("/user");
       setUser(resUser.data.data);
 
-      // Ambil Donasi
       const resDonations = await api.get("/user/donations");
       setDonations(resDonations.data.data);
 
-      // Ambil Adopsi
       const resAdoptions = await api.get("/user/adoptions");
       setAdoptions(resAdoptions.data.data);
 
@@ -52,7 +53,37 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // Helper Badge Status
+  // --- LOGIC CANCEL ---
+  const openCancelModal = (petId: number) => {
+    setSelectedPetId(petId);
+    setCancelReason("");
+    setCancelModalOpen(true);
+  };
+
+  const handleCancelSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cancelReason.trim()) {
+        toast.error("Wajib isi alasan pembatalan.");
+        return;
+    }
+
+    setIsCanceling(true);
+    const loadingToast = toast.loading("Memproses pembatalan...");
+
+    try {
+        await api.post(`/pets/${selectedPetId}/cancel`, { reason: cancelReason });
+        toast.dismiss(loadingToast);
+        toast.success("Donasi berhasil dibatalkan.");
+        setCancelModalOpen(false);
+        fetchData(); // Refresh data dashboard
+    } catch (error) {
+        toast.dismiss(loadingToast);
+        toast.error("Gagal membatalkan donasi.");
+    } finally {
+        setIsCanceling(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'available':
@@ -64,7 +95,9 @@ export default function Dashboard() {
       case 'adopted':
         return <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">Teradopsi 🎉</span>;
       case 'rejected':
-        return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-xs font-bold border border-danger/20">Ditolak</span>;
+        return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-xs font-bold border border-danger/20">Ditolak Admin</span>;
+      case 'canceled':
+        return <span className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-bold border border-gray-300">Dibatalkan Pemilik</span>;
       default:
         return <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">{status}</span>;
     }
@@ -81,9 +114,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-12">
       
-      {/* 1. HEADER & PROFILE (DENGAN ORNAMEN BACKGROUND) */}
+      {/* HEADER */}
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
-        {/* Ornamen Background */}
         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
         <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-accent/10 rounded-full blur-2xl"></div>
 
@@ -101,14 +133,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 2. TABEL DONASI SAYA (Status Hewan yang Anda Berikan) */}
+      {/* 2. TABEL DONASI SAYA */}
       <section>
         <h2 className="text-xl font-bold text-dark mb-4 flex items-center gap-2 border-b pb-2">
             📤 Hewan yang Saya Donasikan
         </h2>
         
         {donations.length === 0 ? (
-            // EMPTY STATE DONASI (DENGAN ILUSTRASI ICONS)
             <div className="bg-white p-10 rounded-2xl text-center border-2 border-dashed border-gray-200 flex flex-col items-center justify-center min-h-[200px]">
                 <div className="text-6xl mb-4 grayscale opacity-30">📦</div>
                 <h3 className="text-lg font-bold text-gray-400">Belum ada donasi</h3>
@@ -133,30 +164,42 @@ export default function Dashboard() {
                         <h3 className="font-bold text-lg text-dark">{pet.name}</h3>
                         <p className="text-sm text-gray-500">{pet.species} • {pet.breed || 'Campuran'}</p>
                         
-                        {/* PANDUAN STATUS DONASI (FITUR PENTING) */}
+                        {/* AREA PESAN STATUS */}
                         <div className="mt-4 pt-4 border-t border-gray-100 flex-grow">
                             {pet.status === 'pending_review' && (
                                 <p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                                    ⏳ Admin sedang memeriksa data. Pastikan HP Anda aktif jika admin menghubungi.
+                                    ⏳ Menunggu review Admin.
                                 </p>
                             )}
                             {pet.status === 'available' && (
                                 <p className="text-xs text-green-700 bg-green-50 p-2 rounded">
-                                    ✅ Hewan sudah tayang di Galeri. Mohon rawat hewan sampai ada pengajuan adopsi masuk.
+                                    ✅ Tayang di Galeri.
                                 </p>
                             )}
-                            {pet.status === 'adopted' && (
-                                <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
-                                    🎉 Hewan telah menemukan pemilik baru. Terima kasih atas kebaikan Anda!
-                                </p>
+                            {pet.status === 'canceled' && (
+                                <div className="bg-gray-100 p-3 rounded border border-gray-200">
+                                    <p className="text-xs text-gray-500 font-bold mb-1">⚠️ Donasi Dibatalkan</p>
+                                    <p className="text-xs text-gray-400 italic">"{pet.cancellation_reason}"</p>
+                                </div>
                             )}
                             {pet.status === 'rejected' && (
-                                <p className="text-xs text-red-700 bg-red-50 p-2 rounded">
-                                    ❌ Donasi ditolak. {pet.admin_note ? `Alasan: ${pet.admin_note}` : 'Data kurang jelas.'}
-                                </p>
+                                <div className="bg-red-50 p-3 rounded border border-red-100">
+                                    <p className="text-xs text-red-700 font-bold mb-1">❌ Ditolak Admin</p>
+                                    <p className="text-xs text-gray-600 italic">"{pet.admin_note}"</p>
+                                </div>
                             )}
                         </div>
 
+                        {/* TOMBOL BATALKAN (Hanya muncul jika Pending atau Available) */}
+                        {(pet.status === 'pending_review' || pet.status === 'available') && (
+                            <button 
+                                onClick={() => openCancelModal(pet.id)}
+                                className="mt-3 w-full border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold py-2 rounded-lg transition"
+                            >
+                                🚫 Batalkan Donasi
+                            </button>
+                        )}
+                        
                         <div className="mt-3 text-xs text-gray-400 text-right">
                             Diajukan: {new Date(pet.created_at).toLocaleDateString("id-ID")}
                         </div>
@@ -173,7 +216,6 @@ export default function Dashboard() {
         </h2>
 
         {adoptions.length === 0 ? (
-            // EMPTY STATE ADOPSI (DENGAN ILUSTRASI ICONS)
             <div className="bg-white p-10 rounded-2xl text-center border-2 border-dashed border-gray-200 flex flex-col items-center justify-center min-h-[200px]">
                 <div className="text-6xl mb-4 grayscale opacity-30">🏠</div>
                 <h3 className="text-lg font-bold text-gray-400">Belum ada pengajuan</h3>
@@ -197,23 +239,22 @@ export default function Dashboard() {
                         <div className="flex flex-col items-end gap-2 w-full md:w-auto text-right">
                             {getStatusBadge(adoption.status)}
                             
-                            {/* FITUR BARU: TOMBOL WA JIKA DISETUJUI */}
                             {adoption.status === 'approved' && (
                                 <div className="flex flex-col items-end gap-1">
                                     <p className="text-xs text-green-600 font-bold">Permintaan disetujui!</p>
                                     <a 
-                                        href={`https://wa.me/${ADMIN_WA_NUMBER}?text=Halo Admin AdoptPet, saya ${user?.name}. Pengajuan adopsi saya untuk hewan ${adoption.pet?.name} (ID: ${adoption.pet?.id}) telah disetujui. Bagaimana prosedur penjemputannya?`}
+                                        href={`https://wa.me/${ADMIN_WA_NUMBER}?text=Halo Admin, saya ${user?.name}. Pengajuan adopsi ${adoption.pet?.name} (ID: ${adoption.pet?.id}) disetujui.`}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-xs bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 flex items-center gap-1 transition shadow-sm animate-pulse"
                                     >
-                                        📞 Hubungi Admin untuk Penjemputan
+                                        📞 Hubungi Admin
                                     </a>
                                 </div>
                             )}
 
                             {adoption.status === 'rejected' && adoption.admin_note && (
-                                <div className="bg-red-50 px-3 py-2 rounded-lg max-w-xs">
+                                <div className="bg-red-50 px-3 py-2 rounded-lg max-w-xs text-left">
                                     <p className="text-xs text-danger font-bold">Alasan Penolakan:</p>
                                     <p className="text-xs text-gray-600">{adoption.admin_note}</p>
                                 </div>
@@ -228,6 +269,47 @@ export default function Dashboard() {
             </div>
         )}
       </section>
+
+      {/* --- MODAL BATALKAN DONASI --- */}
+      {cancelModalOpen && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+                <button onClick={() => setCancelModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-dark font-bold text-xl">✕</button>
+                
+                <h3 className="text-xl font-bold text-dark mb-2">Batalkan Donasi?</h3>
+                <p className="text-gray-500 text-sm mb-4">Hewan ini akan dihapus dari daftar tersedia. Tindakan ini tidak dapat dibatalkan.</p>
+                
+                <form onSubmit={handleCancelSubmit}>
+                    <label className="block text-sm font-bold text-dark mb-2">Alasan Pembatalan <span className="text-danger">*</span></label>
+                    <textarea 
+                        className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none mb-4"
+                        rows={3}
+                        placeholder="Contoh: Sudah diadopsi oleh saudara, atau memutuskan merawat sendiri..."
+                        value={cancelReason}
+                        onChange={(e) => setCancelReason(e.target.value)}
+                        required
+                    />
+                    
+                    <div className="flex gap-3">
+                        <button 
+                            type="button"
+                            onClick={() => setCancelModalOpen(false)} 
+                            className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition"
+                        >
+                            Kembali
+                        </button>
+                        <button 
+                            type="submit"
+                            disabled={isCanceling}
+                            className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition shadow-md disabled:opacity-50"
+                        >
+                            {isCanceling ? "Memproses..." : "Ya, Batalkan"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+      )}
 
     </div>
   );
