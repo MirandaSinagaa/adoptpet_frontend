@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   // Verifikasi Google Search Console (Webmaster Tools)
   verification: {
-    google: "KODE_VERIFIKASI_GOOGLE_ANDA_DISINI", 
+    google: "ySGYDEmUG0jjRglABSdjXE0XDOPDgdPUkiDrZ0VcwmM", 
   },
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // Ganti dengan ID Tracking Google Analytics Anda (Contoh: G-XXXXXXXXXX)
-  const GA_MEASUREMENT_ID = "G-CONTOH12345"; 
+  const GA_MEASUREMENT_ID = "G-MC601ZP8KE"; 
 
   return (
     <html lang="id">
