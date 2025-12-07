@@ -163,7 +163,7 @@ export default function AdminAdoptions() {
                     {viewMode === 'detail' && (
                         <div className="space-y-6">
                              {/* Info Singkat */}
-                             <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-yellow-200 flex-shrink-0">
+                             <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-yellow-200 shrink-0">
                                     {selectedAdoption.pet?.image_url ? (
                                         <img 
                                             src={selectedAdoption.pet.image_url} 

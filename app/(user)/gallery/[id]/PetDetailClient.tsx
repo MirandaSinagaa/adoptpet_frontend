@@ -162,11 +162,11 @@ export default function PetDetailClient({ initialData, id }: { initialData: any,
             </div>
             {pet.images && pet.images.length > 0 && (
                 <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
-                    <button onClick={() => setActiveImage(pet.image_url)} className={`w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 ${activeImage === pet.image_url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}>
+                    <button onClick={() => setActiveImage(pet.image_url)} className={`w-20 h-20 shrink-0 rounded-lg overflow-hidden border-2 ${activeImage === pet.image_url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}>
                         <img src={pet.image_url} className="w-full h-full object-cover" />
                     </button>
                     {pet.images.map((img: any) => (
-                        <button key={img.id} onClick={() => setActiveImage(img.image_url)} className={`w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 ${activeImage === img.image_url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}>
+                        <button key={img.id} onClick={() => setActiveImage(img.image_url)} className={`w-20 h-20 shrink-0 rounded-lg overflow-hidden border-2 ${activeImage === img.image_url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}>
                             <img src={img.image_url} className="w-full h-full object-cover" />
                         </button>
                     ))}

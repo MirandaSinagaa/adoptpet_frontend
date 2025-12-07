@@ -215,7 +215,7 @@ export default function Dashboard() {
                         <h3 className="font-bold text-lg text-dark">{pet.name}</h3>
                         <p className="text-sm text-gray-500">{pet.species} • {pet.breed || 'Campuran'}</p>
                         
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex-grow">
+                        <div className="mt-4 pt-4 border-t border-gray-100 grow">
                             {pet.status === 'pending_review' && (
                                 <p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
                                     ⏳ Admin sedang memeriksa data. Pastikan HP Anda aktif jika admin menghubungi.
@@ -282,7 +282,7 @@ export default function Dashboard() {
                 {adoptions.map((adoption) => (
                     <div key={adoption.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-4 w-full md:w-auto">
-                             <div className="w-12 h-12 bg-accent/20 text-accent rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                             <div className="w-12 h-12 bg-accent/20 text-accent rounded-full flex items-center justify-center font-bold text-xl shrink-0">
                                 ?
                              </div>
                              <div>
@@ -328,7 +328,7 @@ export default function Dashboard() {
 
       {/* --- MODAL BATALKAN DONASI --- */}
       {cancelModalOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
                 <button onClick={() => setCancelModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-dark font-bold text-xl">✕</button>
                 

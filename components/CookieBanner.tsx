@@ -33,7 +33,7 @@ export default function CookieBanner() {
 
   return (
     // Container Fixed di Bawah
-    <div className="fixed bottom-4 left-4 right-4 md:left-8 md:right-8 z-[100] animate-fadeIn">
+    <div className="fixed bottom-4 left-4 right-4 md:left-8 md:right-8 z-100 animate-fadeIn">
       <div className="max-w-6xl mx-auto bg-[#1a202c] text-white p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 border border-gray-700">
         
         {/* Bagian Teks */}

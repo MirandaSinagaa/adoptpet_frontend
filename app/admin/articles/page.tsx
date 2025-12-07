@@ -129,7 +129,7 @@ export default function AdminArticles() {
                         </button>
 
                         {/* Thumbnail */}
-                        <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                        <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
                             {item.image_url ? (
                                 <img src={item.image_url} className="w-full h-full object-cover" alt="Thumbnail" />
                             ) : (

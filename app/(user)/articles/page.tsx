@@ -33,14 +33,14 @@ export default function UserArticles() {
                             <div className="h-48 overflow-hidden bg-gray-100">
                                 <img src={item.image_url} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                             </div>
-                            <div className="p-5 flex flex-col flex-grow">
+                            <div className="p-5 flex flex-col grow">
                                 <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded w-fit mb-2">
                                     {item.source_host}
                                 </span>
                                 <h3 className="font-bold text-dark text-lg mb-2 line-clamp-2 group-hover:text-primary transition">
                                     {item.title}
                                 </h3>
-                                <p className="text-sm text-gray-500 line-clamp-3 mb-4 flex-grow">
+                                <p className="text-sm text-gray-500 line-clamp-3 mb-4 grow">
                                     {item.description}
                                 </p>
                                 <div className="text-sm font-bold text-dark">Baca Selengkapnya &rarr;</div>

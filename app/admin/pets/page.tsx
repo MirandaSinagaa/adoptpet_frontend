@@ -190,7 +190,7 @@ export default function AdminPetsMaster() {
                                 <tr key={pet.id} className="hover:bg-gray-50 transition">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 shrink-0">
                                                 {pet.image_url ? (
                                                      <img src={pet.image_url} className="w-full h-full object-cover" />
                                                 ) : (
@@ -247,9 +247,9 @@ export default function AdminPetsMaster() {
                              )}
                         </div>
                         <div className="flex gap-2 overflow-x-auto justify-center custom-scrollbar">
-                            <button onClick={() => setActiveImage(viewPet.image_url)} className="w-12 h-12 border rounded overflow-hidden flex-shrink-0"><img src={viewPet.image_url} className="w-full h-full object-cover" /></button>
+                            <button onClick={() => setActiveImage(viewPet.image_url)} className="w-12 h-12 border rounded overflow-hidden shrink-0"><img src={viewPet.image_url} className="w-full h-full object-cover" /></button>
                             {viewPet.images?.map((img: any) => (
-                                <button key={img.id} onClick={() => setActiveImage(img.image_url)} className="w-12 h-12 border rounded overflow-hidden flex-shrink-0"><img src={img.image_url} className="w-full h-full object-cover" /></button>
+                                <button key={img.id} onClick={() => setActiveImage(img.image_url)} className="w-12 h-12 border rounded overflow-hidden shrink-0"><img src={img.image_url} className="w-full h-full object-cover" /></button>
                             ))}
                         </div>
                     </div>

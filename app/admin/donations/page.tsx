@@ -151,14 +151,14 @@ export default function AdminDonations() {
                     </button>
 
                     <div className="flex gap-4 cursor-pointer" onClick={() => openViewModal(pet)}>
-                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                             {pet.image_url ? (
                                 <img src={pet.image_url} className="w-full h-full object-cover" alt={pet.name} />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-2xl">🐾</div>
                             )}
                         </div>
-                        <div className="flex-grow">
+                        <div className="grow">
                             <div className="flex justify-between items-start pr-8">
                                 <h3 className="font-bold text-lg text-dark hover:text-primary">{pet.name}</h3>
                                 <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold uppercase">{pet.species}</span>
@@ -217,11 +217,11 @@ export default function AdminDonations() {
                     
                     {/* Thumbnail List */}
                     <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar justify-center">
-                        <button onClick={() => setActiveImage(viewPet.image_url)} className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 ${activeImage === viewPet.image_url ? 'border-primary' : 'border-transparent opacity-50 hover:opacity-100'}`}>
+                        <button onClick={() => setActiveImage(viewPet.image_url)} className={`w-16 h-16 rounded border-2 overflow-hidden shrink-0 ${activeImage === viewPet.image_url ? 'border-primary' : 'border-transparent opacity-50 hover:opacity-100'}`}>
                             <img src={viewPet.image_url} className="w-full h-full object-cover" />
                         </button>
                         {viewPet.images && viewPet.images.map((img: any) => (
-                            <button key={img.id} onClick={() => setActiveImage(img.image_url)} className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 ${activeImage === img.image_url ? 'border-primary' : 'border-transparent opacity-50 hover:opacity-100'}`}>
+                            <button key={img.id} onClick={() => setActiveImage(img.image_url)} className={`w-16 h-16 rounded border-2 overflow-hidden shrink-0 ${activeImage === img.image_url ? 'border-primary' : 'border-transparent opacity-50 hover:opacity-100'}`}>
                                 <img src={img.image_url} className="w-full h-full object-cover" />
                             </button>
                         ))}
@@ -282,7 +282,7 @@ export default function AdminDonations() {
 
       {/* --- MODAL 2: EDIT DATA --- */}
       {editingPet && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
             <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl relative my-10">
                 <button onClick={() => setEditingPet(null)} className="absolute top-4 right-4 text-gray-400 hover:text-dark font-bold text-xl">✕</button>
                 <h2 className="text-xl font-bold text-primary mb-6">Edit Data Hewan</h2>
@@ -320,7 +320,7 @@ export default function AdminDonations() {
 
       {/* --- MODAL 3: KONFIRMASI (PENGGANTI ALERT) --- */}
       {confirmAction && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl relative">
                 <button onClick={() => setConfirmAction(null)} className="absolute top-4 right-4 text-gray-400 hover:text-dark">✕</button>
                 
