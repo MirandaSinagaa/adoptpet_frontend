@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script"; // Import Script untuk Analytics
+import Script from "next/script"; 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner"; // Import Komponen Baru
 import { Toaster } from "react-hot-toast";
 
 // 1. METADATA (SEO & PWA)
@@ -10,7 +11,6 @@ export const metadata: Metadata = {
   title: "AdoptPet - Temukan Sahabat Barumu",
   description: "Platform adopsi hewan terpercaya.",
   manifest: "/manifest.json",
-  // Verifikasi Google Search Console (Webmaster Tools)
   verification: {
     google: "ySGYDEmUG0jjRglABSdjXE0XDOPDgdPUkiDrZ0VcwmM", 
   },
@@ -29,7 +29,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Ganti dengan ID Tracking Google Analytics Anda (Contoh: G-XXXXXXXXXX)
+  // ID Google Analytics Kamu
   const GA_MEASUREMENT_ID = "G-MC601ZP8KE"; 
 
   return (
@@ -50,6 +50,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="flex flex-col min-h-screen bg-light text-dark">
+        {/* Toast Notification */}
         <Toaster 
           position="top-center" 
           reverseOrder={false}
@@ -68,6 +69,10 @@ export default function RootLayout({
         </main>
 
         <Footer />
+
+        {/* COOKIE BANNER (Ditaruh paling bawah agar di atas elemen lain secara visual) */}
+        <CookieBanner />
+        
       </body>
     </html>
   );
