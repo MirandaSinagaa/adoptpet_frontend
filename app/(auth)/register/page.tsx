@@ -15,8 +15,8 @@ export default function Register() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<any>({}); 
-
-  // STATE SHOW HIDE PASSWORD
+  
+  // STATE SHOW HIDE PASSWORD (2 State terpisah)
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -38,24 +38,12 @@ export default function Register() {
     e.preventDefault();
     if (!validateForm()) { toast.error("Perbaiki data yang salah."); return; }
     setIsLoading(true);
-    const loadingToast = toast.loading("Mendaftarkan akun...");
 
     try {
       await api.post("/register", formData);
-      
-      toast.dismiss(loadingToast);
-      
-      // PESAN KHUSUS VERIFIKASI EMAIL
-      toast.success("Berhasil! Silakan Cek Email Anda untuk verifikasi.", {
-        duration: 6000, // Tampil lebih lama biar terbaca
-        icon: '📧'
-      });
-
-      // Redirect ke login setelah 3 detik
-      setTimeout(() => router.push("/login"), 3000);
-
+      toast.success("Registrasi Berhasil! Mengalihkan...");
+      setTimeout(() => router.push("/login"), 1500);
     } catch (error: any) {
-      toast.dismiss(loadingToast);
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
         toast.error("Gagal! Periksa inputan Anda.");
@@ -73,6 +61,7 @@ export default function Register() {
     }`;
   };
 
+  // Helper Component Icon Mata (Biar kodenya rapi)
   const EyeIcon = ({ isVisible, onClick }: { isVisible: boolean, onClick: () => void }) => (
     <button type="button" onClick={onClick} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary transition">
         {isVisible ? (
